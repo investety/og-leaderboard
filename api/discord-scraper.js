@@ -44,3 +44,19 @@ module.exports = async function handler(req, res) {
           if (!['home','search','explore','notifications','messages','i','intent','share','hashtag','status'].includes(handle)) {
             handles.add(handle);
           }
+}
+      }
+      lastId = msg.id;
+    }
+
+    if (messages.length < 100) break;
+    iterations++;
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  return res.status(200).json({ handles: [...handles], total: handles.size });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
