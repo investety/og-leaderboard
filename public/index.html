@@ -16,7 +16,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
 
 /* NAVBAR */
-.navbar{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:var(--bg)}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:var(--bg);max-width:1100px;margin:0 auto}
 .nav-left{display:flex;align-items:center;gap:14px}
 .nav-logo{width:44px;height:44px;object-fit:contain}
 .nav-titles{}
@@ -89,7 +89,7 @@ select option{background:var(--card)}
 .page-info{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
 
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
 .stat-val{font-size:20px;font-weight:700;color:var(--blue);font-family:'IBM Plex Mono',monospace}
 .stat-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;margin-top:3px;text-transform:uppercase}
@@ -123,6 +123,7 @@ select option{background:var(--card)}
 </head>
 <body>
 
+<div style="border-bottom:1px solid var(--border)">
 <nav class="navbar">
   <div class="nav-left">
     <img src="Logo.png" class="nav-logo" alt="OG">
@@ -142,6 +143,7 @@ select option{background:var(--card)}
     </button>
   </div>
 </nav>
+</div>
 <div class="divider"></div>
 
 <div class="main">
@@ -152,7 +154,6 @@ select option{background:var(--card)}
       <div class="stat-card"><div class="stat-val" id="s-total">—</div><div class="stat-label">On Leaderboard</div></div>
       <div class="stat-card"><div class="stat-val" id="s-topmsg">—</div><div class="stat-label">Top Messages</div></div>
       <div class="stat-card"><div class="stat-val" id="s-avglvl">—</div><div class="stat-label">Avg Level</div></div>
-      <div class="stat-card"><div class="stat-val" id="s-roles">—</div><div class="stat-label">Roles Tracked</div></div>
     </div>
 
     <div class="controls-row">
@@ -263,7 +264,6 @@ function updateStats(){
   document.getElementById('s-total').textContent=fmt(allUsers.length);
   document.getElementById('s-topmsg').textContent=fmt(Math.max(0,...msgs));
   document.getElementById('s-avglvl').textContent=lvls.length?Math.round(lvls.reduce((a,b)=>a+b,0)/lvls.length):'—';
-  document.getElementById('s-roles').textContent=roleRewards.length||'—';
 }
 
 function applyFilter(){
@@ -302,7 +302,6 @@ function renderPage(){
       <td><span class="num msgs">${fmt(u.message_count||0)}</span></td>
       <td><span class="num xp">${fmt(u.xp||0)}</span></td>
       <td><span class="level-badge">LVL ${u.level||0}</span></td>
-      <td>${roleHtml}</td>
     </tr>`;
   }).join('');
 
@@ -314,7 +313,6 @@ function renderPage(){
         <th>Messages</th>
         <th>XP</th>
         <th>Level</th>
-        <th class="accent">Role</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
