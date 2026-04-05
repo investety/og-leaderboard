@@ -16,7 +16,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
 
 /* NAVBAR */
-.navbar{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:var(--bg);max-width:1100px;margin:0 auto;width:100%}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:var(--bg)}
 .nav-left{display:flex;align-items:center;gap:14px}
 .nav-logo{width:44px;height:44px;object-fit:contain}
 .nav-titles{}
@@ -80,10 +80,12 @@ select option{background:var(--card)}
 .error-box{background:rgba(226,75,74,0.07);border:1px solid rgba(226,75,74,0.2);border-radius:8px;padding:20px;text-align:center;margin:16px 0;font-size:12px;font-family:'IBM Plex Mono',monospace;color:#e24b4a;line-height:1.8}
 
 /* PAGINATION */
-.page-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:20px}
-.page-btn{padding:7px 18px;border-radius:7px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.15s}
+.page-controls{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;flex-wrap:wrap}
+.page-btn{padding:7px 14px;border-radius:7px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.15s}
 .page-btn:disabled{opacity:0.25;cursor:not-allowed}
 .page-btn:not(:disabled):hover{border-color:var(--blue);color:var(--blue)}
+.page-btn.current{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.page-btn.nav-arrow{padding:7px 16px}
 .page-info{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
 
 /* STATS */
@@ -121,7 +123,7 @@ select option{background:var(--card)}
 </head>
 <body>
 
-<div style="border-bottom:1px solid var(--border)"><nav class="navbar">
+<nav class="navbar">
   <div class="nav-left">
     <img src="Logo.png" class="nav-logo" alt="OG">
     <div class="nav-titles">
@@ -177,11 +179,7 @@ select option{background:var(--card)}
     <div class="table-wrap">
       <div id="d-content"><div class="loading-state"><span class="dots">Connecting to MEE6</span></div></div>
     </div>
-    <div class="page-controls" id="d-pages" style="display:none">
-      <button class="page-btn" id="d-prev" onclick="goPage(-1)">← Prev</button>
-      <span class="page-info" id="d-pinfo"></span>
-      <button class="page-btn" id="d-next" onclick="goPage(1)">Next →</button>
-    </div>
+    <div class="page-controls" id="d-pages" style="display:none"></div>
   </div>
 
   <!-- X PANEL -->
@@ -215,9 +213,13 @@ const rankCell=i=>{
 
 function getRoleForLevel(level){
   if(!roleRewards.length)return null;
-  const sorted=[...roleRewards].sort((a,b)=>b.level-a.level);
-  for(const r of sorted){if(level>=r.level)return r.role.name}
-  return null;
+  // MEE6 role_rewards: [{level: N, role: {name: '...'}}, ...]
+  const earned=roleRewards
+    .filter(r=>level>=(r.level||r.rank||0))
+    .sort((a,b)=>(b.level||0)-(a.level||0));
+  if(!earned.length)return null;
+  const r=earned[0];
+  return r.role?.name||r.name||null;
 }
 
 async function fetchPage(p){
@@ -317,18 +319,38 @@ function renderPage(){
       <tbody>${rows}</tbody>
     </table>`;
 
+  const pg=document.getElementById('d-pages');
   if(totalPages>1){
-    document.getElementById('d-pages').style.display='flex';
-    document.getElementById('d-pinfo').textContent=`${curPage+1} / ${totalPages}`;
-    document.getElementById('d-prev').disabled=curPage===0;
-    document.getElementById('d-next').disabled=curPage>=totalPages-1;
+    pg.style.display='flex';
+    // build page buttons: prev, up to 7 page numbers, next
+    const maxVisible=7;
+    let pages=[];
+    if(totalPages<=maxVisible){
+      for(let i=0;i<totalPages;i++)pages.push(i);
+    }else{
+      pages=[0];
+      let start=Math.max(1,curPage-2);
+      let end=Math.min(totalPages-2,curPage+2);
+      if(start>1)pages.push('...');
+      for(let i=start;i<=end;i++)pages.push(i);
+      if(end<totalPages-2)pages.push('...');
+      pages.push(totalPages-1);
+    }
+    let html=`<button class="page-btn nav-arrow" onclick="goPage(-1)" ${curPage===0?'disabled':''}>← Prev</button>`;
+    pages.forEach(p=>{
+      if(p==='...')html+=`<span class="page-info">…</span>`;
+      else html+=`<button class="page-btn${p===curPage?' current':''}" onclick="jumpPage(${p})">${p+1}</button>`;
+    });
+    html+=`<button class="page-btn nav-arrow" onclick="goPage(1)" ${curPage>=totalPages-1?'disabled':''}>Next →</button>`;
+    pg.innerHTML=html;
   }else{
-    document.getElementById('d-pages').style.display='none';
+    pg.style.display='none';
   }
 }
 
 function setSort(k){sortKey=k;applyFilter()}
 function goPage(d){curPage+=d;renderPage();window.scrollTo({top:0,behavior:'smooth'})}
+function jumpPage(p){curPage=p;renderPage();window.scrollTo({top:0,behavior:'smooth'})}
 function switchTab(t){
   document.getElementById('discord-panel').style.display=t==='discord'?'block':'none';
   document.getElementById('x-panel').style.display=t==='x'?'block':'none';
