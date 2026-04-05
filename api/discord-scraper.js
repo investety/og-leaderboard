@@ -21,12 +21,23 @@ export default async function handler(req, res) {
       const response = await fetch(url, {
         headers: {
           'Authorization': TOKEN,
-          'User-Agent': 'Mozilla/5.0',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': '*/*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Content-Type': 'application/json',
+          'X-Discord-Locale': 'en-US',
+          'X-Debug-Options': 'bugReporterEnabled',
+          'Referer': 'https://discord.com/channels/1132794141403791483/1133796571343894137',
+          'Origin': 'https://discord.com',
+          'Sec-Fetch-Dest': 'empty',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Site': 'same-origin',
         },
       });
 
       if (!response.ok) {
-        return res.status(response.status).json({ error: `Discord API error: ${response.status}` });
+        const text = await response.text();
+        return res.status(response.status).json({ error: `Discord API error: ${response.status}`, detail: text });
       }
 
       const messages = await response.json();
@@ -51,11 +62,4 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       handles: [...handles],
-      total: handles.size,
-      messages_scanned: iterations * 100,
-    });
-
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-}
+      total
