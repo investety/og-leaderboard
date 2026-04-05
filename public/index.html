@@ -16,7 +16,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
 
 /* NAVBAR */
-.navbar{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:var(--bg)}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:var(--bg);max-width:1100px;margin:0 auto;width:100%}
 .nav-left{display:flex;align-items:center;gap:14px}
 .nav-logo{width:44px;height:44px;object-fit:contain}
 .nav-titles{}
@@ -121,7 +121,7 @@ select option{background:var(--card)}
 </head>
 <body>
 
-<nav class="navbar">
+<div style="border-bottom:1px solid var(--border)"><nav class="navbar">
   <div class="nav-left">
     <img src="Logo.png" class="nav-logo" alt="OG">
     <div class="nav-titles">
