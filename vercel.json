@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/mee6", "destination": "/api/mee6.js" }
+  ]
+}
