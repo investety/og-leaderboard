@@ -233,7 +233,7 @@ async function init(){
   allUsers=[];roleRewards=[];
   document.getElementById('d-content').innerHTML='<div class="loading-state"><span class="dots">Connecting to MEE6</span></div>';
   document.getElementById('d-pages').style.display='none';
-  ['s-total','s-topmsg','s-avglvl','s-roles'].forEach(id=>document.getElementById(id).textContent='—');
+  ['s-total','s-topmsg','s-avglvl'].forEach(id=>document.getElementById(id).textContent='—');
 
   try{
     const first=await fetchPage(0);
@@ -291,8 +291,6 @@ function renderPage(){
     const rank=start+i;
     const avUrl=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.webp?size=32`:'';
     const avStyle=avUrl?`background-image:url('${avUrl}');background-color:${avColor(u.username)}`:`background:${avColor(u.username)}`;
-    const role=getRoleForLevel(u.level||0);
-    const roleHtml=role?`<span class="role-badge">${role}</span>`:`<span class="role-none">—</span>`;
     return`<tr>
       ${rankCell(rank)}
       <td><div class="user-cell">
