@@ -155,7 +155,7 @@ async function init(){
     allUsers=[...first.players];
     updateStats();applyFilter();
     if(first.players.length===100){
-      for(let p=1;p<=9;p++){
+      for(let p=1;p<=49;p++){
         try{const more=await fetchPage(p);if(!more.players||!more.players.length)break;allUsers=[...allUsers,...more.players];updateStats();applyFilter();if(more.players.length<100)break;}catch{break}
       }
     }
